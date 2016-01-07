@@ -1,0 +1,90 @@
+<?php
+
+/**
+ * @file
+ * js_snippet_injector/js_snippet_injector.module
+ * Handle menu and actual js injection
+ */
+
+/**
+ * Implements hook_page_alter().
+ */
+function js_snippet_injector_page_alter(&$page) {
+
+  // Populate our array with variables from our config form
+  $snippets = array();
+  $header_snippets = '';
+  $footer_snippets = '';
+
+  for ($i = 0; $i < variable_get('js_snippet_injector_num_fields'); $i++) {
+
+    // Append the value to the header snippet
+    $header_snippets .= '
+
+    ';
+    if (variable_get('js_snippet_injector_header_snippet_jquery_toggle_' . $i, '') == TRUE) {
+    $header_snippets .= 'jQuery(document).ready(function () { ';
+    }
+    $header_snippets .= '
+
+    ';
+    $header_snippets .= '  ' . variable_get('js_snippet_injector_header_snippet_' . $i, '');
+    $header_snippets .= '
+
+    ';
+    if (variable_get('js_snippet_injector_header_snippet_jquery_toggle_' . $i, '') == TRUE) {
+    $header_snippets .= '});';
+    }
+    $header_snippets .= '
+
+    ';
+
+    // Append the value to the footer snippet
+    $footer_snippets .= '
+
+    ';
+    if (variable_get('js_snippet_injector_footer_snippet_jquery_toggle_' . $i, '') == TRUE) {
+    $footer_snippets .= 'jQuery(document).ready(function () { ';
+    }
+    $footer_snippets .= '
+
+    ';
+    $footer_snippets .= '  ' . variable_get('js_snippet_injector_footer_snippet_' . $i, '');
+    $footer_snippets .= '
+
+    ';
+    if (variable_get('js_snippet_injector_footer_snippet_jquery_toggle_' . $i, '') == TRUE) {
+    $footer_snippets .= '});';
+    }
+    $footer_snippets .= '
+
+    ';
+  }
+
+  // Inject the header snippets
+  drupal_add_js($header_snippets, array('type' => 'inline', 'scope' => 'header', 'weight' => 99));
+
+  // Inject the footer snippets
+  drupal_add_js($footer_snippets, array('type' => 'inline', 'scope' => 'footer', 'weight' => 99));
+
+}
+
+/**
+ * Implements hook_menu().
+ */
+function js_snippet_injector_menu() {
+
+  $items = array();
+
+  $items['admin/config/search/js_snippet_injector'] = array(
+    'title' => 'Javascript Snippet Injector module settings',
+    'description' => 'Configure the Javascript Snippet Injector module.',
+    'page callback' => 'drupal_get_form',
+    'file' => 'js_snippet_injector_form.inc',
+    'page arguments' => array('js_snippet_injector_form'),
+    'access arguments' => array('administer js_snippet_injector settings'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}

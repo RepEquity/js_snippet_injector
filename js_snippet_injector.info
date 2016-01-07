@@ -1,0 +1,4 @@
+name = Javascript Snippet Injector
+description = Module to inject javascript snippets into the header or footer.
+core = 7.x
+package = RepEquity
